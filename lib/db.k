@@ -42,8 +42,20 @@ let setup = (db, tenant_id) -> {
     seedTenant(db, tenant_id)
 }
 
-let upsertUser = (db, user) ->
-    exec(db, "INSERT INTO users (id, email) VALUES ($1, $2) ON CONFLICT (email) DO NOTHING", [user.id, user.email], "upsert user")
+let upsertUser = (db, user) -> {
+    exec(
+        db,
+        "DELETE FROM users WHERE email = $1 AND id <> $2",
+        [user.email, user.id],
+        "drop stale user id"
+    )
+    exec(
+        db,
+        "INSERT INTO users (id, email) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email",
+        [user.id, user.email],
+        "upsert user"
+    )
+}
 
 let listUsers = db -> query(db, "SELECT id, email, last_email_check, last_email_received FROM users", [], "list users")
 

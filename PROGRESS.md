@@ -26,9 +26,11 @@ Completed:
 - Tests/scripts:
   - `tests/mock_data_test.k`
   - `tests/dedupe_regression.k`
+  - `tests/user_rekey_regression.k`
   - `scripts/test_unit.sh`
   - `scripts/test_mock_api.sh`
   - `scripts/test_dedupe_regression.sh`
+  - `scripts/test_user_rekey_regression.sh`
   - `scripts/test_discovery_smoke.sh`
   - `scripts/test_user_removal_regression.sh`
   - `scripts/test_all.sh`
@@ -36,15 +38,20 @@ Completed:
 - Documentation:
   - `README.md`
   - `KARL_FEEDBACK.md` updated with issues found during implementation
+  - `COMMAND_LOG.md` updated with executed commands
 
 Validated:
 - `karl run cmd/setup.k`
 - `bash scripts/test_unit.sh`
 - `bash scripts/test_mock_api.sh`
 - `bash scripts/test_dedupe_regression.sh`
+- `bash scripts/test_user_rekey_regression.sh`
 - `bash scripts/test_discovery_smoke.sh`
 - `bash scripts/test_user_removal_regression.sh`
 - `bash scripts/test_all.sh`
+
+Recent hardening:
+- Fixed restart-safe user upsert to prevent `user_emails_user_id_fkey` errors when provider user IDs rotate for the same email.
 
 ## Remaining Work
 - Expand toward production-level concerns:

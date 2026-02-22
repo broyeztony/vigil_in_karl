@@ -120,3 +120,11 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: ensure Docker/docs additions did not regress runtime behavior.
 58. `cat > .gitignore`
     - Purpose: ignore local runtime/log artifacts such as `test.log`.
+59. `rg -n "storeDiscoveredEmail|user_emails|upsertUser|syncUsers" lib tests cmd` and `sed -n`/`nl -ba` reads on `lib/discovery_app.k`, `lib/db.k`, `lib/mock_data.k`
+    - Purpose: trace FK error path and identify root cause around user identity churn vs email uniqueness.
+60. `docker compose logs --tail=...`, `docker compose ps -a`, `curl http://127.0.0.1:8080/google/users/...`, `docker exec vik-postgres psql ...`
+    - Purpose: validate runtime state (provider user count, DB row counts, and FK failure timing).
+61. `bash scripts/test_all.sh`
+    - Purpose: baseline full test suite before and after DB/user-id fix.
+62. `make down && make up`, `docker compose logs --since=...`, `docker exec vik-postgres psql ...`
+    - Purpose: confirm clean restart behavior and DB growth without recurring FK violations.

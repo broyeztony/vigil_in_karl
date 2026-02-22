@@ -73,6 +73,9 @@ bash scripts/test_mock_api.sh
 # dedupe regression (fingerprint and message_id collisions)
 bash scripts/test_dedupe_regression.sh
 
+# same-email user-id rekey regression (restart-safe upsert)
+bash scripts/test_user_rekey_regression.sh
+
 # full smoke test (setup + mock + discovery + DB assertions)
 bash scripts/test_discovery_smoke.sh
 

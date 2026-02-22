@@ -66,3 +66,11 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: full smoke test (setup + mock + discovery + Postgres assertions).
 31. `PORT=18091 ... karl run cmd/mock_server.k ... ; curl -i /google/users/...`
     - Purpose: isolate/debug `500` mock endpoint error and confirm fix.
+32. `git -C /Users/tonybroyez/Documents/vigil_in_karl add -A`
+    - Purpose: stage first implementation slice.
+33. `git -C /Users/tonybroyez/Documents/vigil_in_karl commit -m "feat: bootstrap vigil in karl runtime + smoke tests"`
+    - Purpose: create first atomic checkpoint commit.
+34. `git -C /Users/tonybroyez/Documents/vigil_in_karl push -u origin main`
+    - Purpose: publish first checkpoint to remote.
+35. `bash scripts/test_all.sh`
+    - Purpose: run full validation suite (unit + mock smoke + discovery smoke).

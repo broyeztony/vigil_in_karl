@@ -40,6 +40,12 @@ bash scripts/test_mock_api.sh
 
 # full smoke test (setup + mock + discovery + DB assertions)
 bash scripts/test_discovery_smoke.sh
+
+# run all tests
+bash scripts/test_all.sh
+
+# inspect current DB state
+bash scripts/inspect_db.sh
 ```
 
 ## Main env vars

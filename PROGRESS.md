@@ -23,6 +23,8 @@ Completed:
   - `scripts/test_unit.sh`
   - `scripts/test_mock_api.sh`
   - `scripts/test_discovery_smoke.sh`
+  - `scripts/test_all.sh`
+  - `scripts/inspect_db.sh`
 - Documentation:
   - `README.md`
   - `KARL_FEEDBACK.md` updated with issues found during implementation

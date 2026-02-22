@@ -25,6 +25,7 @@ cleanup() {
 trap cleanup EXIT
 
 DATABASE_URL="$DATABASE_URL" TENANT_ID="$TENANT_ID" karl run cmd/setup.k
+psql "$DATABASE_URL" -c "TRUNCATE TABLE user_emails, emails, users;"
 
 PORT="$PORT" TENANT_ID="$TENANT_ID" MOCK_INITIAL_USERS="${MOCK_INITIAL_USERS:-100}" MOCK_EMAIL_TICK_MS="${MOCK_EMAIL_TICK_MS:-500}" \
   karl run cmd/mock_server.k >"$MOCK_LOG" 2>&1 &

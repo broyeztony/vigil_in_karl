@@ -61,7 +61,6 @@ let pollUserOnce = (state, user) -> {
     let received_after = timeFormatRFC3339(if from_ms < 0 { 0 } else { from_ms })
 
     let emails = Provider.getEmails(state.cfg, user.id, received_after, "received_at") ? {
-        state.stats.provider_emails_errors = state.stats.provider_emails_errors + 1
         log("provider.getEmails error", { user_id: user.id, message: error.message, })
         let fallback = []
         fallback
@@ -93,8 +92,6 @@ let stopUserWorker = (state, user_id, reason) -> {
         worker.cancel()
         (wait worker) ? {}
         delete(state.active, user_id)
-        state.stats.workers_stopped = state.stats.workers_stopped + 1
-        if reason == "provider_removed" { state.stats.users_removed = state.stats.users_removed + 1 }
     }
 }
 
@@ -108,7 +105,6 @@ let stopAllWorkers = state -> {
 
 let syncUsers = state -> {
     let users = Provider.getUsers(state.cfg, state.cfg.tenant_id) ? {
-        state.stats.provider_users_errors = state.stats.provider_users_errors + 1
         log("provider.getUsers error", error.message)
         let fallback = []
         fallback
@@ -127,8 +123,6 @@ let syncUsers = state -> {
         if !has(state.active, user.id) {
             let jitter_ms = if state.cfg.email_jitter_ms < 1 { 0 } else { randInt(0, state.cfg.email_jitter_ms) }
             set(state.active, user.id, & runUserPoller(state, user, jitter_ms))
-            state.stats.users_added = state.stats.users_added + 1
-            state.stats.workers_started = state.stats.workers_started + 1
         }
         i++
     } then ()
@@ -191,14 +185,6 @@ let metricsSnapshot = state -> {
     top_users: topUsers(state, 3),
 }
 
-let metricsLoop = state -> {
-    let every_ms = minSleep(state.cfg.metrics_ms)
-    for true with running = true {
-        sleep(every_ms)
-        log("metrics", metricsSnapshot(state))
-    } then ()
-}
-
 let setup = cfg -> {
     let db = DB.open(cfg.database_url) ? { fail("db open failed: " + error.message) }
     DB.setup(db, cfg.tenant_id) ? {
@@ -236,18 +222,14 @@ let run = cfg -> {
 
     let processor = & processLoop(state)
     let user_discovery = & userDiscoveryLoop(state)
-    let metrics = & metricsLoop(state)
 
     let [signal_name, done] = signalWatch(["SIGINT", "SIGTERM"]).recv()
     if !done { log("shutdown", signal_name) }
 
     user_discovery.cancel()
-    metrics.cancel()
+    (wait user_discovery) ? {}
     stopAllWorkers(state)
     processor.cancel()
-
-    (wait user_discovery) ? {}
-    (wait metrics) ? {}
     (wait processor) ? {}
     DB.close(db) ? { fail("db close failed: " + error.message) }
 

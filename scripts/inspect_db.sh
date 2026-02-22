@@ -1,13 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DATABASE_URL="${DATABASE_URL:-postgres://vigil:vigil@localhost:5432/vigil?sslmode=disable}"
+choose_psql_target() {
+  if [[ -z "${DATABASE_URL:-}" ]] && docker ps --format '{{.Names}}' | grep -qx "vik-postgres"; then
+    TARGET_LABEL="docker:vik-postgres"
+    PSQL_CMD=(docker exec -i vik-postgres psql -U vigil -d vigil)
+  else
+    local url="${DATABASE_URL:-postgres://vigil:vigil@localhost:5432/vigil?sslmode=disable}"
+    TARGET_LABEL="$url"
+    PSQL_CMD=(psql "$url")
+  fi
+}
+
+run_query() {
+  "${PSQL_CMD[@]}" -c "$1"
+}
+
+choose_psql_target
 
 echo "=== vigil_in_karl DB inspector ==="
+echo "target: ${TARGET_LABEL}"
 echo
 
 echo "record counts:"
-psql "$DATABASE_URL" -c "
+run_query "
 SELECT 'tenant' AS table_name, COUNT(*) AS count FROM tenant
 UNION ALL
 SELECT 'users', COUNT(*) FROM users
@@ -19,7 +35,7 @@ SELECT 'user_emails', COUNT(*) FROM user_emails;
 
 echo
 echo "top users by linked emails:"
-psql "$DATABASE_URL" -c "
+run_query "
 SELECT
   u.email,
   COUNT(ue.email_id) AS email_count,

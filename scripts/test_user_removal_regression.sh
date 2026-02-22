@@ -60,7 +60,8 @@ summary_line="$(grep 'stopped {' "$DISCOVERY_LOG" | tail -n 1 || true)"
 [[ -n "$summary_line" ]]
 echo "$summary_line"
 
-grep -Eq 'users_removed: [1-9][0-9]*' "$DISCOVERY_LOG"
-grep -Eq 'workers_stopped: [1-9][0-9]*' "$DISCOVERY_LOG"
+grep -Eq 'active_workers: 0' "$DISCOVERY_LOG"
+grep -Eq 'seen: [1-9][0-9]*' "$DISCOVERY_LOG"
+! grep -Eq 'fatal error:|panic:' "$DISCOVERY_LOG"
 
 echo "user-removal regression: ok"

@@ -132,3 +132,19 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: add and verify a `make watch-db` command for continuous DB inspection.
 64. `apply_patch` on `README.md`
     - Purpose: document `make watch-db` in the Docker/Make workflow.
+65. `docker compose ps -a`, `docker compose logs discovery`, `docker compose logs ... | rg "fatal error: concurrent map read and map write"`
+    - Purpose: diagnose "DB not moving" report and identify discovery crash root cause.
+66. `apply_patch` on `lib/discovery_app.k`
+    - Purpose: remove concurrent shared-map access (no concurrent metrics loop and safer shutdown ordering) to prevent discovery runtime crash.
+67. `apply_patch` on `scripts/test_user_removal_regression.sh`
+    - Purpose: align regression assertions with crash-safe lifecycle checks after stats concurrency changes.
+68. `bash scripts/test_all.sh`
+    - Purpose: validate full suite after concurrency fix.
+69. `psql ...localhost:5432...` vs `docker exec vik-postgres psql ...` and `lsof -nP -iTCP:5432`
+    - Purpose: confirm host Postgres and Docker Postgres both present; explain stale inspector output.
+70. `apply_patch` on `scripts/inspect_db.sh`
+    - Purpose: auto-target Docker Postgres (`vik-postgres`) by default when running.
+71. `bash scripts/inspect_db.sh` and `docker compose logs --since=5m discovery | rg "fatal error|panic"`
+    - Purpose: verify live Docker DB growth and absence of recent discovery crash.
+72. `apply_patch` on `README.md` and `PROGRESS.md`
+    - Purpose: document new inspector behavior and concurrency hardening status.

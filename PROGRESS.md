@@ -52,6 +52,8 @@ Validated:
 
 Recent hardening:
 - Fixed restart-safe user upsert to prevent `user_emails_user_id_fkey` errors when provider user IDs rotate for the same email.
+- Fixed discovery crash (`fatal error: concurrent map read and map write`) by removing concurrent shared-map reads/writes in runtime loops and tightening shutdown ordering.
+- Updated DB inspector to auto-read Docker Postgres (`vik-postgres`) when available to avoid host-Postgres confusion on `localhost:5432`.
 
 ## Remaining Work
 - Expand toward production-level concerns:

@@ -90,6 +90,10 @@ bash scripts/test_all.sh
 bash scripts/inspect_db.sh
 ```
 
+Notes:
+- `scripts/inspect_db.sh` auto-targets `docker:vik-postgres` when that container is running.
+- Set `DATABASE_URL=...` to force inspection of a specific non-Docker database.
+
 ## Main env vars
 
 - `DATABASE_URL` (default `postgres://vigil:vigil@localhost:5432/vigil?sslmode=disable`)

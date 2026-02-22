@@ -74,3 +74,11 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: publish first checkpoint to remote.
 35. `bash scripts/test_all.sh`
     - Purpose: run full validation suite (unit + mock smoke + discovery smoke).
+36. `git -C /Users/tonybroyez/Documents/vigil_in_karl add -A`
+    - Purpose: stage second implementation slice (scripts/docs hardening).
+37. `git -C /Users/tonybroyez/Documents/vigil_in_karl commit -m "chore: add full test runner and DB inspection scripts"`
+    - Purpose: commit second incremental checkpoint.
+38. `git -C /Users/tonybroyez/Documents/vigil_in_karl push`
+    - Purpose: push second commit (initial non-escalated attempt failed due network restriction in sandbox).
+39. `git -C /Users/tonybroyez/Documents/vigil_in_karl push` (escalated)
+    - Purpose: successfully push second commit to `origin/main`.

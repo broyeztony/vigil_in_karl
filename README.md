@@ -91,8 +91,8 @@ bash scripts/inspect_db.sh
 ```
 
 Notes:
-- `scripts/inspect_db.sh` auto-targets `docker:vik-postgres` when that container is running.
-- Set `DATABASE_URL=...` to force inspection of a specific non-Docker database.
+- `scripts/inspect_db.sh` targets only `docker:vik-postgres`.
+- If Docker DB is down, it exits and asks you to run `make up`.
 
 ## Main env vars
 

@@ -152,3 +152,7 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: diagnose why counts remained after `make clean`; confirm host Postgres and Docker Postgres are distinct.
 74. `apply_patch` on `scripts/inspect_db.sh`
     - Purpose: add explicit warning when `vik-postgres` is down and inspection falls back to host `localhost:5432`.
+75. `apply_patch` on `scripts/inspect_db.sh`
+    - Purpose: remove host-Postgres fallback entirely; inspect now targets only Docker `vik-postgres`.
+76. `apply_patch` on `README.md` and `PROGRESS.md`
+    - Purpose: align docs with Docker-only inspection behavior.

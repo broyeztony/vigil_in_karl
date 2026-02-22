@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM golang:1.24-alpine AS karl-builder
+FROM golang:1.25.3-alpine AS karl-builder
 ARG KARL_REF=main
 RUN apk add --no-cache git
 WORKDIR /src

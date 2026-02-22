@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        KARL_REF: ${KARL_REF:-main}
+        KARL_REF: ${KARL_REF:-315de45f91afc7a3154ce8d6d7d189e4b5d62923}
     container_name: vik-mock-server
     command: ["karl", "run", "cmd/mock_server.k"]
     environment:
@@ -41,7 +41,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        KARL_REF: ${KARL_REF:-main}
+        KARL_REF: ${KARL_REF:-315de45f91afc7a3154ce8d6d7d189e4b5d62923}
     container_name: vik-discovery
     command: ["/bin/bash", "/app/scripts/docker_discovery_entrypoint.sh"]
     environment:

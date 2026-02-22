@@ -2,14 +2,22 @@
 set -euo pipefail
 
 choose_psql_target() {
-  if [[ -z "${DATABASE_URL:-}" ]] && docker ps --format '{{.Names}}' | grep -qx "vik-postgres"; then
-    TARGET_LABEL="docker:vik-postgres"
-    PSQL_CMD=(docker exec -i vik-postgres psql -U vigil -d vigil)
-  else
-    local url="${DATABASE_URL:-postgres://vigil:vigil@localhost:5432/vigil?sslmode=disable}"
+  TARGET_WARNING=""
+  if [[ -n "${DATABASE_URL:-}" ]]; then
+    local url="${DATABASE_URL}"
     TARGET_LABEL="$url"
     PSQL_CMD=(psql "$url")
+    return
   fi
+  if docker ps --format '{{.Names}}' | grep -qx "vik-postgres"; then
+    TARGET_LABEL="docker:vik-postgres"
+    PSQL_CMD=(docker exec -i vik-postgres psql -U vigil -d vigil)
+    return
+  fi
+  local url="postgres://vigil:vigil@localhost:5432/vigil?sslmode=disable"
+  TARGET_LABEL="$url"
+  TARGET_WARNING="vik-postgres is not running; inspecting host Postgres on localhost:5432."
+  PSQL_CMD=(psql "$url")
 }
 
 run_query() {
@@ -20,6 +28,9 @@ choose_psql_target
 
 echo "=== vigil_in_karl DB inspector ==="
 echo "target: ${TARGET_LABEL}"
+if [[ -n "${TARGET_WARNING}" ]]; then
+  echo "warning: ${TARGET_WARNING}"
+fi
 echo
 
 echo "record counts:"

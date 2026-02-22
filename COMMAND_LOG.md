@@ -148,3 +148,7 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: verify live Docker DB growth and absence of recent discovery crash.
 72. `apply_patch` on `README.md` and `PROGRESS.md`
     - Purpose: document new inspector behavior and concurrency hardening status.
+73. `docker volume ls`, `lsof -nP -iTCP:5432 -sTCP:LISTEN`, `psql ...localhost:5432...`, `docker exec vik-postgres psql ...`
+    - Purpose: diagnose why counts remained after `make clean`; confirm host Postgres and Docker Postgres are distinct.
+74. `apply_patch` on `scripts/inspect_db.sh`
+    - Purpose: add explicit warning when `vik-postgres` is down and inspection falls back to host `localhost:5432`.

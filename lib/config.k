@@ -21,4 +21,6 @@ let get = () -> {
     initial_lookback_ms: envInt("INITIAL_LOOKBACK_MS", 24 * 60 * 60 * 1000),
     metrics_ms: envInt("METRICS_MS", 5000),
     shutdown_timeout_ms: envInt("SHUTDOWN_TIMEOUT_MS", 10000),
+
+    analysis_queue_mode: toLower(envStr("ANALYSIS_QUEUE_MODE", "log")),
 }

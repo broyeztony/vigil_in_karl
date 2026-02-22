@@ -59,5 +59,6 @@ echo "users=$users_count emails=$emails_count user_emails=$links_count"
 [[ "${users_count:-0}" -ge 1 ]]
 [[ "${emails_count:-0}" -ge 1 ]]
 [[ "${links_count:-0}" -ge 1 ]]
+[[ "${links_count:-0}" -ge "${emails_count:-0}" ]]
 
 echo "discovery smoke: ok"

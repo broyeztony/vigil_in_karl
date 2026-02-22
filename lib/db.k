@@ -70,22 +70,39 @@ let linkUserEmail = (db, user_id, email_id) ->
     )
 
 let storeDiscoveredEmail = (db, email, user_id) -> {
-    let body = email.body ? { "" }
+    let body = if email.body == null { "" } else { email.body }
     let fingerprint = sha256(body)
-    let received_at = email.received_at ? { timeFormatRFC3339(now()) }
-    let incoming_id = email.message_id ? { uuidNew() }
+    let received_at = if email.received_at == null { timeFormatRFC3339(now()) } else { email.received_at }
+    let incoming_id = if email.message_id == null { uuidNew() } else { email.message_id }
 
-    let ins = exec(
-        db,
-        "INSERT INTO emails (id, fingerprint, received_at) VALUES ($1, $2, $3) ON CONFLICT (fingerprint) DO NOTHING",
-        [incoming_id, fingerprint, received_at],
-        "insert email metadata"
-    )
-    let existing = queryOne(db, "SELECT id FROM emails WHERE fingerprint = $1 LIMIT 1", [fingerprint], "find email by fingerprint")
-    if existing == null { fail("find email by fingerprint: no row after insert") }
+    let existing_by_fp = queryOne(db, "SELECT id FROM emails WHERE fingerprint = $1 LIMIT 1", [fingerprint], "find email by fingerprint")
 
-    let email_id = existing.id
-    let is_new = ins.rowsAffected > 0
+    let resolved = if existing_by_fp != null {
+        { email_id: existing_by_fp.id, is_new: false, }
+    } else {
+        let ins = exec(
+            db,
+            "INSERT INTO emails (id, fingerprint, received_at) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING",
+            [incoming_id, fingerprint, received_at],
+            "insert email metadata"
+        )
+
+        if ins.rowsAffected > 0 {
+            { email_id: incoming_id, is_new: true, }
+        } else {
+            let existing_by_id = queryOne(db, "SELECT id FROM emails WHERE id = $1 LIMIT 1", [incoming_id], "find email by id")
+            if existing_by_id != null {
+                { email_id: existing_by_id.id, is_new: false, }
+            } else {
+                let raced = queryOne(db, "SELECT id FROM emails WHERE fingerprint = $1 LIMIT 1", [fingerprint], "find raced fingerprint")
+                if raced == null { fail("storeDiscoveredEmail: row not found after insert conflict") }
+                { email_id: raced.id, is_new: false, }
+            }
+        }
+    }
+
+    let email_id = resolved.email_id
+    let is_new = resolved.is_new
 
     linkUserEmail(db, user_id, email_id)
     setLastEmailCheck(db, user_id, timeFormatRFC3339(now()))

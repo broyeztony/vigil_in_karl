@@ -6,13 +6,13 @@ let MockData = makeMockData()
 
 let defaultReceivedAfter = () -> timeFormatRFC3339(timeAdd(now(), -24 * 60 * 60 * 1000))
 
-let parseNumUsers = req -> {
+let parseNumUsers = (req, fallback) -> {
     let body = if trim(req.body ? { "" }) == "" { null } else { Common.parseJSON(req.body) }
     let from_body = if body == null { null } else { body.numUsers }
     let from_query = req.query.numUsers
-    let raw = if from_body != null { from_body } else { from_query ? { 1 } }
-    let n = parseInt(str(raw)) ? { 1 }
-    if n < 1 { 1 } else { n }
+    let raw = if from_body != null { from_body } else { if from_query == null { fallback } else { from_query } }
+    let n = parseInt(str(raw)) ? { fallback }
+    if n < 0 { 0 } else { n }
 }
 
 let handleHealth = req -> Common.jsonResponse(200, { status: "ok", })
@@ -33,20 +33,36 @@ let handleGetEmails = (state, req) -> {
 }
 
 let handleAddUsers = (state, req) -> {
-    let n = parseNumUsers(req)
-    let total = MockData.addUsers(state, n)
+    let n = parseNumUsers(req, 1)
+    let total = MockData.addUsers(state, if n < 1 { 1 } else { n })
     Common.jsonResponse(200, {
-        added: n,
+        added: if n < 1 { 1 } else { n },
         total: total,
-        message: "Added " + str(n) + " user(s). Total users: " + str(total),
+        message: "Added " + str(if n < 1 { 1 } else { n }) + " user(s). Total users: " + str(total),
     })
 }
+
+let handleSetUsers = (state, req) -> {
+    let before = state.users.length
+    let target = parseNumUsers(req, before)
+    let total = MockData.setUsers(state, target)
+    Common.jsonResponse(200, {
+        previous: before,
+        total: total,
+        message: "Set users from " + str(before) + " to " + str(total),
+    })
+}
+
+let handleState = (state, req) -> Common.jsonResponse(200, MockData.snapshot(state))
 
 let routes = state -> [
     { method: "GET", path: "/health", handler: req -> handleHealth(req), },
     { method: "GET", path: "/google/users/", handler: req -> handleGetUsers(state, req), },
     { method: "GET", path: "/google/emails/", handler: req -> handleGetEmails(state, req), },
+
     { method: "POST", path: "/admin/users/add", handler: req -> handleAddUsers(state, req), },
+    { method: "POST", path: "/admin/users/set", handler: req -> handleSetUsers(state, req), },
+    { method: "GET", path: "/admin/state", handler: req -> handleState(state, req), },
 ]
 
 let start = cfg -> {

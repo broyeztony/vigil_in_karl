@@ -20,9 +20,12 @@ Completed:
   - `cmd/discovery.k`
 - Tests/scripts:
   - `tests/mock_data_test.k`
+  - `tests/dedupe_regression.k`
   - `scripts/test_unit.sh`
   - `scripts/test_mock_api.sh`
+  - `scripts/test_dedupe_regression.sh`
   - `scripts/test_discovery_smoke.sh`
+  - `scripts/test_user_removal_regression.sh`
   - `scripts/test_all.sh`
   - `scripts/inspect_db.sh`
 - Documentation:
@@ -33,13 +36,13 @@ Validated:
 - `karl run cmd/setup.k`
 - `bash scripts/test_unit.sh`
 - `bash scripts/test_mock_api.sh`
+- `bash scripts/test_dedupe_regression.sh`
 - `bash scripts/test_discovery_smoke.sh`
+- `bash scripts/test_user_removal_regression.sh`
+- `bash scripts/test_all.sh`
 
 ## Remaining Work
-
-- Increase behavioral parity with Go service internals where useful:
-  - richer metrics/top-user reporting
-  - explicit queue integration stub boundaries for fraud-analysis handoff
-- Add more targeted regression tests around:
-  - dedupe edge cases (`message_id` collisions / fingerprint duplicates)
-  - user removal path and worker teardown
+- Expand toward production-level concerns:
+  - actual queue transport implementation behind `lib/analysis_queue.k`
+  - retry/backoff/rate-limiting policies for provider HTTP calls
+  - tighter lifecycle tests around long-running shutdown timing windows

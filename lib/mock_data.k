@@ -80,6 +80,28 @@ let addUsers = (state, num) -> {
     state.users.length
 }
 
+let setUsers = (state, num) -> {
+    let target = if num < 0 { 0 } else { num }
+    let current = state.users.length
+
+    if target > current {
+        addUsers(state, target - current)
+    } else if target < current {
+        let old = state.users
+        state.users = for i < target with i = 0, kept = [] {
+            kept = kept + [old[i]]
+            i++
+        } then kept
+
+        for i < old.length with i = target {
+            delete(state.emails, old[i].id)
+            i++
+        } then ()
+    }
+
+    state.users.length
+}
+
 let seedUsers = (state, num) -> addUsers(state, num)
 
 let getUsers = (state, tenant_id) -> {
@@ -87,9 +109,10 @@ let getUsers = (state, tenant_id) -> {
 }
 
 let getEmails = (state, user_id, received_after_ms, order_by) -> {
-    let emails = get(state.emails, user_id) ? { [] }
+    let raw = get(state.emails, user_id)
+    let emails = if raw == null { [] } else { raw }
     let filtered = emails.filter(email -> parseEmailMs(email) >= received_after_ms)
-    let normalized = toLower(trim(order_by ? { "received_at" }))
+    let normalized = if order_by == null { "received_at" } else { toLower(trim(order_by)) }
     filtered.sort((a, b) -> {
         let ams = parseEmailMs(a)
         let bms = parseEmailMs(b)
@@ -102,7 +125,8 @@ let tick = (state, cfg) -> {
     for i < state.users.length with i = 0 {
         let user = state.users[i]
         let batch_size = randInt(0, max_per_tick)
-        let base = get(state.emails, user.id) ? { [] }
+        let raw = get(state.emails, user.id)
+        let base = if raw == null { [] } else { raw }
         let next = for j < batch_size with j = 0, out = base {
             out = out + [makeEmail(user, out.length, j)]
             j++
@@ -110,4 +134,15 @@ let tick = (state, cfg) -> {
         set(state.emails, user.id, next)
         i++
     } then ()
+}
+
+let snapshot = state -> {
+    let ids = keys(state.emails)
+    let total_emails = for i < ids.length with i = 0, total = 0 {
+        let bucket = get(state.emails, ids[i])
+        total = total + (if bucket == null { 0 } else { bucket.length })
+        i++
+    } then total
+    let out = { users: state.users.length, emails: total_emails, counter: state.counter, }
+    out
 }

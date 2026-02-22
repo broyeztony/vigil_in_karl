@@ -37,5 +37,7 @@ if [[ -n "$first_user_id" && "$first_user_id" != "$users_json" ]]; then
 fi
 
 curl -fsS -X POST "http://127.0.0.1:${PORT}/admin/users/add?numUsers=3" | grep -q '"added":3'
+curl -fsS -X POST "http://127.0.0.1:${PORT}/admin/users/set?numUsers=7" | grep -q '"total":7'
+curl -fsS "http://127.0.0.1:${PORT}/admin/state" | grep -q '"users":7'
 
 echo "mock-api smoke: ok"

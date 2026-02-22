@@ -82,3 +82,25 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: push second commit (initial non-escalated attempt failed due network restriction in sandbox).
 39. `git -C /Users/tonybroyez/Documents/vigil_in_karl push` (escalated)
     - Purpose: successfully push second commit to `origin/main`.
+40. `git -C /Users/tonybroyez/Documents/vigil_in_karl add COMMAND_LOG.md && git -C /Users/tonybroyez/Documents/vigil_in_karl commit -m "docs: update command log with latest git/test runs"`
+    - Purpose: commit command-log synchronization.
+41. `git -C /Users/tonybroyez/Documents/vigil_in_karl push`
+    - Purpose: push docs-only command-log commit to `origin/main`.
+42. `bash scripts/test_all.sh`
+    - Purpose: validate suite before implementing parity refinements requested afterward.
+43. `cat > lib/analysis_queue.k`, `cat > lib/config.k`, `cat > lib/db.k`
+    - Purpose: add queue boundary module, expose queue mode config, and harden DB dedupe logic.
+44. `cat > lib/discovery_app.k`, `cat > lib/mock_data.k`, `cat > lib/mock_server_app.k`
+    - Purpose: add richer discovery metrics/top-users, provider-removal handling, and mock admin endpoints (`/admin/users/set`, `/admin/state`).
+45. `cat > tests/dedupe_regression.k`, `cat > scripts/test_dedupe_regression.sh`, `cat > scripts/test_user_removal_regression.sh`
+    - Purpose: add targeted regression coverage for dedupe collisions and worker teardown on user removal.
+46. `chmod +x scripts/*.sh` and `cat > scripts/test_all.sh`
+    - Purpose: ensure scripts are executable and included in aggregate test runner.
+47. `bash scripts/test_user_removal_regression.sh`
+    - Purpose: verify removal metrics and worker teardown after dynamic user shrink.
+48. `bash scripts/test_all.sh`
+    - Purpose: re-run full suite after final discovery metrics polish.
+49. `bash -x scripts/test_mock_api.sh` and `curl -i http://127.0.0.1:18081/admin/state`
+    - Purpose: debug failing `/admin/state` endpoint and capture handler error (`undefined identifier: emails`).
+50. `bash scripts/test_mock_api.sh`, `bash scripts/test_user_removal_regression.sh`, `bash scripts/test_discovery_smoke.sh`, `bash scripts/test_all.sh`
+    - Purpose: re-validate all regressions after fixes and tightened assertions.

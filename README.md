@@ -2,6 +2,10 @@
 
 Reimplementation of [Vigil](https://github.com/broyeztony/vigil) in Karl.
 
+## Preview
+
+![Vigil in Karl: DB inspector + discovery logs](assets/karl-vigil.png)
+
 ## Docker start/stop (recommended)
 
 Requires Docker Desktop (or another running Docker daemon).

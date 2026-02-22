@@ -16,4 +16,4 @@ test:
 	bash scripts/test_all.sh
 
 watch-db:
-	while true; do clear; bash scripts/inspect_db.sh; sleep 2; done
+	while true; do clear; bash scripts/inspect_db.sh; sleep 3; done

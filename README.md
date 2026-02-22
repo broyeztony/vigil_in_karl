@@ -27,6 +27,7 @@ Equivalent Make targets:
 ```bash
 make up
 make logs
+make watch-db
 make down
 make clean
 ```

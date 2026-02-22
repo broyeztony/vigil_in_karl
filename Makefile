@@ -1,4 +1,4 @@
-.PHONY: up down clean logs test
+.PHONY: up down clean logs test watch-db
 
 up:
 	bash scripts/docker_up.sh
@@ -14,3 +14,6 @@ logs:
 
 test:
 	bash scripts/test_all.sh
+
+watch-db:
+	while true; do clear; bash scripts/inspect_db.sh; sleep 2; done

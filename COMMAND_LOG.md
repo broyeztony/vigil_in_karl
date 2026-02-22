@@ -128,3 +128,7 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: baseline full test suite before and after DB/user-id fix.
 62. `make down && make up`, `docker compose logs --since=...`, `docker exec vik-postgres psql ...`
     - Purpose: confirm clean restart behavior and DB growth without recurring FK violations.
+63. `apply_patch` on `Makefile` + `make -n watch-db`
+    - Purpose: add and verify a `make watch-db` command for continuous DB inspection.
+64. `apply_patch` on `README.md`
+    - Purpose: document `make watch-db` in the Docker/Make workflow.

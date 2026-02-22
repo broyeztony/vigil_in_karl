@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: vik-postgres
+    environment:
+      POSTGRES_USER: vigil
+      POSTGRES_PASSWORD: vigil
+      POSTGRES_DB: vigil
+    ports:
+      - "5432:5432"
+    volumes:
+      - vik_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vigil -d vigil"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  mock-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        KARL_REF: ${KARL_REF:-main}
+    container_name: vik-mock-server
+    command: ["karl", "run", "cmd/mock_server.k"]
+    environment:
+      PORT: "8080"
+      TENANT_ID: "00000000-0000-0000-0000-000000000001"
+      MOCK_INITIAL_USERS: "5000"
+      MOCK_EMAIL_TICK_MS: "30000"
+      MOCK_MAX_EMAILS_PER_TICK: "3"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  discovery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        KARL_REF: ${KARL_REF:-main}
+    container_name: vik-discovery
+    command: ["/bin/bash", "/app/scripts/docker_discovery_entrypoint.sh"]
+    environment:
+      DATABASE_URL: "postgres://vigil:vigil@postgres:5432/vigil?sslmode=disable"
+      TENANT_ID: "00000000-0000-0000-0000-000000000001"
+      PROVIDER_TYPE: "google"
+      PROVIDER_API_URL: "http://mock-server:8080"
+      ANALYSIS_QUEUE_MODE: "log"
+      USER_POLL_MS: "60000"
+      EMAIL_POLL_MS: "30000"
+      EMAIL_JITTER_MS: "30000"
+      METRICS_MS: "5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mock-server:
+        condition: service_started
+
+volumes:
+  vik_postgres_data:

@@ -2,6 +2,35 @@
 
 Reimplementation of [Vigil](https://github.com/broyeztony/vigil) in Karl.
 
+## Docker start/stop (recommended)
+
+Requires Docker Desktop (or another running Docker daemon).
+
+```bash
+cd /Users/tonybroyez/Documents/vigil_in_karl
+
+# start full stack (postgres + mock + discovery)
+bash scripts/docker_up.sh
+
+# follow logs
+bash scripts/docker_logs.sh
+
+# stop (keep DB data)
+bash scripts/docker_down.sh
+
+# stop + wipe DB data (clean restart)
+bash scripts/docker_clean.sh
+```
+
+Equivalent Make targets:
+
+```bash
+make up
+make logs
+make down
+make clean
+```
+
 ## What is implemented
 
 - `cmd/setup.k`: creates schema and seeds tenant `00000000-0000-0000-0000-000000000001`
@@ -15,7 +44,7 @@ Reimplementation of [Vigil](https://github.com/broyeztony/vigil) in Karl.
 - `cmd/discovery.k`: user discovery + per-user email polling + fingerprint dedupe + persistence + graceful shutdown
   - includes metrics with top-users and queue boundary (`ANALYSIS_QUEUE_MODE`)
 
-## Quick start
+## Manual local run (without Docker)
 
 ```bash
 cd /Users/tonybroyez/Documents/vigil_in_karl

@@ -104,3 +104,19 @@ This file tracks shell commands run for Vigil-in-Karl development.
     - Purpose: debug failing `/admin/state` endpoint and capture handler error (`undefined identifier: emails`).
 50. `bash scripts/test_mock_api.sh`, `bash scripts/test_user_removal_regression.sh`, `bash scripts/test_discovery_smoke.sh`, `bash scripts/test_all.sh`
     - Purpose: re-validate all regressions after fixes and tightened assertions.
+51. `docker --version && docker compose version`
+    - Purpose: verify local Docker tooling availability.
+52. `docker compose config`
+    - Purpose: validate compose model and dependency wiring before runtime.
+53. `bash scripts/docker_up.sh`
+    - Purpose: attempt dockerized stack startup; failed because Docker daemon was not running.
+54. `cat > .dockerignore`, `cat > Dockerfile`, `cat > docker-compose.yml`
+    - Purpose: add container build/runtime configuration for Vik services.
+55. `cat > scripts/docker_discovery_entrypoint.sh`, `cat > scripts/docker_up.sh`, `cat > scripts/docker_down.sh`, `cat > scripts/docker_clean.sh`, `cat > scripts/docker_logs.sh`, `cat > Makefile`
+    - Purpose: add clean Docker lifecycle commands (start/stop/clean/logs) and make targets.
+56. `bash scripts/docker_up.sh`
+    - Purpose: verify preflight check now reports explicit daemon-not-running guidance.
+57. `bash scripts/test_all.sh`
+    - Purpose: ensure Docker/docs additions did not regress runtime behavior.
+58. `cat > .gitignore`
+    - Purpose: ignore local runtime/log artifacts such as `test.log`.

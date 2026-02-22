@@ -1,0 +1,6 @@
+.git
+.gitignore
+test.log
+*.log
+/tmp
+.DS_Store

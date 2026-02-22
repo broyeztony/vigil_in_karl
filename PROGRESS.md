@@ -18,6 +18,11 @@ Completed:
   - `cmd/setup.k`
   - `cmd/mock_server.k`
   - `cmd/discovery.k`
+- Docker orchestration:
+  - `Dockerfile`
+  - `docker-compose.yml`
+  - `scripts/docker_up.sh`, `scripts/docker_down.sh`, `scripts/docker_clean.sh`, `scripts/docker_logs.sh`, `scripts/docker_discovery_entrypoint.sh`
+  - `Makefile` targets (`up`, `down`, `clean`, `logs`, `test`)
 - Tests/scripts:
   - `tests/mock_data_test.k`
   - `tests/dedupe_regression.k`

@@ -1,6 +1,6 @@
 # Vigil in Karl
 
-Reimplementation of [Vigil](https://github.com/broyeztony/vigil) in Karl.
+Reimplementation of [Vigil](https://github.com/broyeztony/vigil) in [Karl](https://github.com/broyeztony/Karl).
 
 ## Preview
 

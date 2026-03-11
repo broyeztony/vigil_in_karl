@@ -7,7 +7,7 @@ let usersURL = (cfg, tenant_id) -> cfg.provider_api_url + "/" + providerRoot(cfg
 let emailsURL = (cfg, user_id, received_after, order_by) ->
     cfg.provider_api_url + "/" + providerRoot(cfg) + "/emails/" + user_id + "?receivedAfter=" + received_after + "&orderBy=" + order_by
 
-let decode = (text, label) -> jsonDecode(text) ? { fail(label + ": " + error.message) }
+let decode = (text, label) -> decodeJson(text) ? { fail(label + ": " + error.message) }
 
 let getUsers = (cfg, tenant_id) -> {
     let resp = http({ method: "GET", url: usersURL(cfg, tenant_id), }) ? { fail("provider users request failed: " + error.message) }

@@ -61,6 +61,7 @@ let pollUserOnce = (state, user) -> {
     let received_after = timeFormatRFC3339(if from_ms < 0 { 0 } else { from_ms })
 
     let emails = Provider.getEmails(state.cfg, user.id, received_after, "received_at") ? {
+        state.stats.provider_emails_errors = state.stats.provider_emails_errors + 1
         log("provider.getEmails error", { user_id: user.id, message: error.message, })
         let fallback = []
         fallback
@@ -70,9 +71,9 @@ let pollUserOnce = (state, user) -> {
         log("setLastEmailCheck error", { user_id: user.id, message: error.message, })
     }
 
-    for i < emails.length with i = 0 {
-        let sent = state.queue.send({ user_id: user.id, email: emails[i], }) ? { null }
-        if sent == null { return }
+    for i < emails.length && open with i = 0, open = true {
+        let ok = state.queue.send({ user_id: user.id, email: emails[i], }) ? { false }
+        if !ok { open = false }
         i++
     } then ()
 }
@@ -92,6 +93,7 @@ let stopUserWorker = (state, user_id, reason) -> {
         worker.cancel()
         (wait worker) ? {}
         delete(state.active, user_id)
+        state.stats.workers_stopped = state.stats.workers_stopped + 1
     }
 }
 
@@ -103,35 +105,44 @@ let stopAllWorkers = state -> {
     } then ()
 }
 
+let syncOneUser = (state, seen, user) -> {
+    set(seen, user.id, true)
+    set(state.user_emails, user.id, user.email)
+
+    DB.upsertUser(state.db, user) ? {
+        log("upsertUser error", { user_id: user.id, message: error.message, })
+    }
+
+    if !has(state.active, user.id) {
+        let jitter_ms = if state.cfg.email_jitter_ms < 1 { 0 } else { randInt(0, state.cfg.email_jitter_ms) }
+        set(state.active, user.id, & runUserPoller(state, user, jitter_ms))
+        state.stats.users_added = state.stats.users_added + 1
+        state.stats.workers_started = state.stats.workers_started + 1
+    }
+}
+
 let syncUsers = state -> {
     let users = Provider.getUsers(state.cfg, state.cfg.tenant_id) ? {
+        state.stats.provider_users_errors = state.stats.provider_users_errors + 1
         log("provider.getUsers error", error.message)
         let fallback = []
         fallback
     }
+
     let seen = map()
-
+    // Phase 1: upsert current provider users and ensure workers are running.
     for i < users.length with i = 0 {
-        let user = users[i]
-        set(seen, user.id, true)
-        set(state.user_emails, user.id, user.email)
-
-        DB.upsertUser(state.db, user) ? {
-            log("upsertUser error", { user_id: user.id, message: error.message, })
-        }
-
-        if !has(state.active, user.id) {
-            let jitter_ms = if state.cfg.email_jitter_ms < 1 { 0 } else { randInt(0, state.cfg.email_jitter_ms) }
-            set(state.active, user.id, & runUserPoller(state, user, jitter_ms))
-        }
+        syncOneUser(state, seen, users[i])
         i++
     } then ()
 
-    let ids = keys(state.active)
-    for i < ids.length with i = 0 {
-        let user_id = ids[i]
-        if !has(seen, user_id) {
-            stopUserWorker(state, user_id, "provider_removed")
+    // Phase 2: stop workers for users no longer present in provider snapshot.
+    let active_ids = keys(state.active)
+    for i < active_ids.length with i = 0 {
+        let id = active_ids[i]
+        if !has(seen, id) {
+            state.stats.users_removed = state.stats.users_removed + 1
+            stopUserWorker(state, id, "provider_removed")
         }
         i++
     } then ()
@@ -146,28 +157,29 @@ let userDiscoveryLoop = state -> {
     } then ()
 }
 
-let processLoop = state -> {
-    for true with running = true {
-        let [msg, done] = state.queue.recv()
-        if done { break }
+let processMessage = (state, msg) -> {
+    state.stats.seen = state.stats.seen + 1
 
-        state.stats.seen = state.stats.seen + 1
-        let saved = DB.storeDiscoveredEmail(state.db, msg.email, msg.user_id) ? {
-            log("storeDiscoveredEmail error", { user_id: msg.user_id, message: error.message, })
-            null
-        }
+    let saved = DB.storeDiscoveredEmail(state.db, msg.email, msg.user_id) ? {
+        log("storeDiscoveredEmail error", { user_id: msg.user_id, message: error.message, })
+        null
+    }
 
-        if saved != null {
-            if saved.is_new {
-                state.stats.discovered = state.stats.discovered + 1
-                bumpUserDiscovered(state, msg.user_id)
-                sendToAnalysisQueue(state, msg, saved)
-            } else {
-                state.stats.duplicated = state.stats.duplicated + 1
-            }
-        }
-    } then ()
+    if saved == null {
+        { ok: false, }
+    } else if saved.is_new {
+        state.stats.discovered = state.stats.discovered + 1
+        bumpUserDiscovered(state, msg.user_id)
+        sendToAnalysisQueue(state, msg, saved)
+        { ok: true, is_new: true, }
+    } else {
+        state.stats.duplicated = state.stats.duplicated + 1
+        { ok: true, is_new: false, }
+    }
 }
+
+// Queue consumer stream: drains discovered emails until queue.done().
+let processStream = state -> fromChannel(state.queue) | map(msg -> processMessage(state, msg)) | count()
 
 let metricsSnapshot = state -> {
     active_workers: keys(state.active).length,
@@ -220,7 +232,7 @@ let run = cfg -> {
         },
     }
 
-    let processor = & processLoop(state)
+    let processor = & processStream(state)
     let user_discovery = & userDiscoveryLoop(state)
 
     let [signal_name, done] = signalWatch(["SIGINT", "SIGTERM"]).recv()
@@ -229,9 +241,10 @@ let run = cfg -> {
     user_discovery.cancel()
     (wait user_discovery) ? {}
     stopAllWorkers(state)
-    processor.cancel()
+    // Closing queue after workers stop lets processor drain and terminate.
+    state.queue.done()
     (wait processor) ? {}
-    DB.close(db) ? { fail("db close failed: " + error.message) }
 
+    DB.close(db) ? { fail("db close failed: " + error.message) }
     metricsSnapshot(state)
 }

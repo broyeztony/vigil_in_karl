@@ -98,6 +98,7 @@ Suggested pipeline:
 ## Notes
 
 - Architecture notes: `docs/ARCHITECTURE.md`
+  - includes topology + full runtime activity diagram
 - Progress and design logs:
   - `PROGRESS.md`
   - `DECISIONS.md`

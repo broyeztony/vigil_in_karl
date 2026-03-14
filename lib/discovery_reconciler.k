@@ -5,25 +5,28 @@ let Workers = (import "./discovery_workers.k")()
 let run = state -> {
     let users = Provider.users(state.cfg, state.cfg.tenant_id) ? {
         log("users fetch error", error.message)
-        let fallback = []
-        fallback
+        null
     }
 
-    let seen = map()
-    users.forEach(user -> {
-        DbUsers.upsert(state.db, user)
-        set(seen, user.id, true)
-        Workers.ensure(state, user.id)
-    })
-
-    keys(state.active)
-        .filter(id -> !has(seen, id))
-        .forEach(id -> {
-            Workers.stopOne(state, id)
-            DbUsers.remove(state.db, id)
+    if users == null {
+        { ok: false, users: 0, active: len(keys(state.active)), }
+    } else {
+        let seen = map()
+        users.forEach(user -> {
+            DbUsers.upsert(state.db, user)
+            set(seen, user.id, true)
+            Workers.ensure(state, user.id)
         })
 
-    { users: users.length, active: len(keys(state.active)), }
+        keys(state.active)
+            .filter(id -> !has(seen, id))
+            .forEach(id -> {
+                Workers.stopOne(state, id)
+                DbUsers.remove(state.db, id)
+            })
+
+        { ok: true, users: users.length, active: len(keys(state.active)), }
+    }
 }
 
 { run, }

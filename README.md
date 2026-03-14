@@ -68,6 +68,7 @@ Default DB DSN:
 - `tests/mock_provider_smoke.k`
 - `tests/discovery_smoke.k`
 - `tests/discovery_user_churn.k`
+- `tests/discovery_provider_users_error_no_remove.k`
 
 Run all:
 

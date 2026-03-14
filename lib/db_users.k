@@ -24,5 +24,3 @@ let markChecked = (db, user_id, ts) ->
 
 let markReceived = (db, user_id, ts) ->
     DbCore.exec(db, "UPDATE users SET last_email_received = $1 WHERE id = $2", [ts, user_id], "mark received")
-
-{ upsert, byId, all, remove, markChecked, markReceived, }

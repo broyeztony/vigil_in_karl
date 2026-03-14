@@ -23,5 +23,3 @@ let stop = state -> {
     done(state.queue)
     state.consumer_tasks.forEach(t -> (wait t) ? {})
 }
-
-{ start, stop, }

@@ -11,5 +11,3 @@ let bad = msg -> {
     headers: headers(),
     body: toJson({ error: msg, }),
 }
-
-{ ok, bad, }

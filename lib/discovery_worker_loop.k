@@ -24,5 +24,3 @@ let run = (state, user_id, stop) -> {
         sleep(state.cfg.email_poll_ms)
     } then ()
 }
-
-{ run, }

@@ -20,5 +20,3 @@ let emails = (cfg, user_id, received_after) -> {
         case _ -> fail("provider emails status " + str(resp.status) + ": " + resp.body)
     }
 }
-
-{ users, emails, }

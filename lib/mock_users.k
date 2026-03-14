@@ -10,5 +10,3 @@ let seed = (count, start) ->
     } then xs
 
 let indexById = users -> users.reduce((acc, u) -> set(acc, u.id, u), map())
-
-{ seed, indexById, }

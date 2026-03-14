@@ -18,8 +18,4 @@ let stopOne = (state, user_id) -> {
     }
 }
 
-let stopAll = state -> {
-    keys(state.active).forEach(id -> stopOne(state, id))
-}
-
-{ ensure, stopOne, stopAll, }
+let stopAll = state -> keys(state.active).forEach(id -> stopOne(state, id))

@@ -28,5 +28,3 @@ let addUsers = (state, n) -> {
     state.next_index = state.next_index + add.length
     state.byId = MockUsers.indexById(state.users)
 }
-
-{ build, resetUsers, addUsers, }

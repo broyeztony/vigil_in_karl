@@ -9,5 +9,3 @@ let all = (conn, query, params, label) ->
 
 let one = (conn, query, params, label) ->
     sqlQueryOne(conn, query, params) ? { fail(label + ": " + error.message) }
-
-{ open, close, exec, all, one, }

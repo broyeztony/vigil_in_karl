@@ -28,5 +28,3 @@ let run = state -> {
         { ok: true, users: users.length, active: len(keys(state.active)), }
     }
 }
-
-{ run, }

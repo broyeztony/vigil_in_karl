@@ -23,5 +23,3 @@ let list = (cfg, user_id, received_after) ->
         if received_after == "" || e.received_at > received_after { xs += [e] }
         i++
     } then xs
-
-{ list, }

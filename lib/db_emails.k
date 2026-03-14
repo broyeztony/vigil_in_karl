@@ -33,5 +33,3 @@ let store = (db, user_id, email) -> {
     DbUsers.markChecked(db, user_id, timeFormatRFC3339(now()))
     DbUsers.markReceived(db, user_id, received_at)
 }
-
-{ store, }

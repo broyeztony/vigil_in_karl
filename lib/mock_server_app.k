@@ -29,5 +29,3 @@ let start = cfg -> {
 }
 
 let stop = app -> httpServerStop(app.server)
-
-{ start, stop, }

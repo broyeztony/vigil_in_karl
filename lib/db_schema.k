@@ -24,5 +24,3 @@ let seedTenant = (db, tenant_id) ->
         [tenant_id, "ACME Corp", "google"],
         "seed tenant"
     )
-
-{ migrate, seedTenant, }

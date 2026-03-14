@@ -11,5 +11,3 @@ let addUsers = (state, req, Json, MockState) -> {
     MockState.addUsers(state, n)
     Json.ok({ users: state.users.length, })
 }
-
-{ setUsers, addUsers, }

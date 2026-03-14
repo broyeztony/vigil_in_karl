@@ -15,5 +15,3 @@ let get = () -> {
     queue_size: intEnv("QUEUE_SIZE", 8192),
     consumer_count: intEnv("CONSUMER_COUNT", 4),
 }
-
-{ get, }

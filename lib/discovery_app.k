@@ -37,5 +37,3 @@ let stop = state -> {
     Consumers.stop(state)
     DbCore.close(state.db)
 }
-
-{ start, stop, }

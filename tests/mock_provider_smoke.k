@@ -2,15 +2,15 @@ let Config = (import "../lib/config.k")()
 let MockServer = (import "../lib/mock_server_app.k")()
 
 let cfg = Config.get()
+cfg.mock_addr = ":18080"
 let app = MockServer.start(cfg)
-let base = "http://127.0.0.1:" + trim(env("PORT"))
 
-let users = fromJson(http({ method: "GET", url: base + "/users", }).body)
+let users = fromJson(http({ method: "GET", url: "http://127.0.0.1:18080/users", }).body)
 if users.length < 1 { fail("expected users") }
 
-let first = users[0]
-let q = base + "/emails?user_id=" + first.id + "&received_after="
-let emails = fromJson(http({ method: "GET", url: q, }).body)
+let one = users[0]
+let url = "http://127.0.0.1:18080/emails?user_id=" + one.id + "&received_after="
+let emails = fromJson(http({ method: "GET", url: url, }).body)
 if emails.length < 1 { fail("expected emails") }
 
 MockServer.stop(app)

@@ -1,4 +1,4 @@
-.PHONY: up down clean setup mock discovery logs watch-db test
+.PHONY: up down clean setup mock discovery logs watch-db test test-churn
 
 up:
 	docker compose up -d postgres
@@ -27,3 +27,6 @@ watch-db:
 
 test:
 	bash scripts/test_all.sh
+
+test-churn:
+	bash scripts/test_user_churn.sh

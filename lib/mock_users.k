@@ -1,12 +1,14 @@
-let mkUser = i -> {
+let mk = i -> {
     id: uuidNew(),
     email: "user." + str(i) + "@example.com",
 }
 
-let seed = n ->
-    for i < n with i = 0, xs = [] {
-        xs += [mkUser(i)]
+let seed = (count, start) ->
+    for i < count with i = 0, xs = [] {
+        xs += [mk(start + i)]
         i++
     } then xs
 
-{ seed, }
+let indexById = users -> users.reduce((acc, u) -> set(acc, u.id, u), map())
+
+{ seed, indexById, }

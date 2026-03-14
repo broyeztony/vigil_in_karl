@@ -1,26 +1,20 @@
 let DbCore = (import "./db_core.k")()
 
-let upsert = (db, user) ->
-    {
-        DbCore.exec(db, "DELETE FROM users WHERE email = $1 AND id <> $2", [user.email, user.id], "drop stale user")
-        DbCore.exec(
-            db,
-            "INSERT INTO users (id, email) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email",
-            [user.id, user.email],
-            "upsert user"
-        )
-    }
+let upsert = (db, user) -> {
+    DbCore.exec(db, "DELETE FROM users WHERE email = $1 AND id <> $2", [user.email, user.id], "drop stale user")
+    DbCore.exec(
+        db,
+        "INSERT INTO users (id, email) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email",
+        [user.id, user.email],
+        "upsert user"
+    )
+}
 
 let byId = (db, user_id) ->
-    DbCore.one(
-        db,
-        "SELECT id, email, last_email_check, last_email_received FROM users WHERE id = $1",
-        [user_id],
-        "get user"
-    )
+    DbCore.one(db, "SELECT id, email, last_email_check, last_email_received FROM users WHERE id = $1", [user_id], "user by id")
 
 let all = db ->
-    DbCore.all(db, "SELECT id, email FROM users", [], "list users")
+    DbCore.all(db, "SELECT id, email, last_email_check, last_email_received FROM users", [], "list users")
 
 let remove = (db, user_id) ->
     DbCore.exec(db, "DELETE FROM users WHERE id = $1", [user_id], "remove user")

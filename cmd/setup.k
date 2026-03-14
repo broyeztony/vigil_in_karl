@@ -8,4 +8,4 @@ DbSchema.migrate(db)
 DbSchema.seedTenant(db, cfg.tenant_id)
 DbCore.close(db)
 
-log({ setup: "ok", tenant: cfg.tenant_id, })
+log({ setup: "ok", tenant_id: cfg.tenant_id, })

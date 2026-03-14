@@ -1,12 +1,14 @@
+let headers = () -> map().set("Content-Type", "application/json")
+
 let ok = payload -> {
     status: 200,
-    headers: map().set("Content-Type", "application/json"),
+    headers: headers(),
     body: toJson(payload),
 }
 
 let bad = msg -> {
     status: 400,
-    headers: map().set("Content-Type", "application/json"),
+    headers: headers(),
     body: toJson({ error: msg, }),
 }
 

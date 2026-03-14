@@ -8,7 +8,7 @@ let migrate = db -> {
         "CREATE TABLE IF NOT EXISTS emails (id UUID PRIMARY KEY, fingerprint VARCHAR(64) NOT NULL UNIQUE, received_at TIMESTAMPTZ NOT NULL)",
         "CREATE TABLE IF NOT EXISTS user_emails (user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, email_id UUID NOT NULL REFERENCES emails(id) ON DELETE CASCADE, PRIMARY KEY (user_id, email_id))",
         "CREATE INDEX IF NOT EXISTS idx_users_last_email_received ON users(last_email_received)",
-        "CREATE INDEX IF NOT EXISTS idx_emails_received_at ON emails(received_at)",
+        "CREATE INDEX IF NOT EXISTS idx_emails_fingerprint ON emails(fingerprint)",
     ]
 
     for i < steps.length with i = 0 {

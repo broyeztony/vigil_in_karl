@@ -1,32 +1,41 @@
 let DbCore = (import "./db_core.k")()
 let DbSchema = (import "./db_schema.k")()
-let DiscoveryCycle = (import "./discovery_cycle.k")()
+let Consumers = (import "./discovery_consumers.k")()
+let Reconciler = (import "./discovery_reconciler.k")()
+let Workers = (import "./discovery_workers.k")()
 
 let start = cfg -> {
     let db = DbCore.open(cfg)
     DbSchema.migrate(db)
     DbSchema.seedTenant(db, cfg.tenant_id)
 
-    let running = map().set("value", true)
-    let worker = spawn (() -> {
-        for running.get("value") with _ = 0 {
-            let out = DiscoveryCycle.sync({ cfg: cfg, db: db, }) ? {
-                log("sync error", error.message)
-                { users: -1, }
-            }
-            if out.users >= 0 { log("sync", out) }
-            sleep(cfg.user_sync_ms)
+    let state = {
+        cfg: cfg,
+        db: db,
+        queue: buffered(cfg.queue_size),
+        active: map(),
+        running: map().set("on", true),
+        consumer_tasks: [],
+    }
+
+    Consumers.start(state)
+    state.reconciler = spawn (() -> {
+        for state.running.get("on") with _ = 0 {
+            log("sync", Reconciler.run(state))
+            sleep(state.cfg.user_sync_ms)
         } then ()
     })()
 
-    { cfg: cfg, db: db, running: running, worker: worker, }
+    state
 }
 
-let stop = app -> {
-    app.running.set("value", false)
-    app.worker.cancel()
-    (wait app.worker) ? {}
-    DbCore.close(app.db)
+let stop = state -> {
+    state.running.set("on", false)
+    state.reconciler.cancel()
+    (wait state.reconciler) ? {}
+    Workers.stopAll(state)
+    Consumers.stop(state)
+    DbCore.close(state.db)
 }
 
 { start, stop, }

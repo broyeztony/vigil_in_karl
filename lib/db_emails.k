@@ -9,17 +9,17 @@ let link = (db, user_id, email_id) ->
         "link user email"
     )
 
-let resolveEmailId = (db, incoming_id, fingerprint, received_at) -> {
-    let byFp = DbCore.one(db, "SELECT id FROM emails WHERE fingerprint = $1", [fingerprint], "find by fp")
+let resolveEmailId = (db, incoming_id, fp, received_at) -> {
+    let byFp = DbCore.one(db, "SELECT id FROM emails WHERE fingerprint = $1", [fp], "find email")
     if byFp != null { byFp.id } else {
         DbCore.exec(
             db,
             "INSERT INTO emails (id, fingerprint, received_at) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING",
-            [incoming_id, fingerprint, received_at],
+            [incoming_id, fp, received_at],
             "insert email"
         )
-        let done = DbCore.one(db, "SELECT id FROM emails WHERE fingerprint = $1", [fingerprint], "resolve email")
-        if done == null { fail("resolve email id failed") }
+        let done = DbCore.one(db, "SELECT id FROM emails WHERE fingerprint = $1", [fp], "resolve email")
+        if done == null { fail("resolve email failed") }
         done.id
     }
 }

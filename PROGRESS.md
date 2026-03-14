@@ -21,6 +21,9 @@
 - validated green:
   - `make setup`
   - `make test`
+- removed signal workaround in entrypoints:
+  - replaced spawn+infinite-sleep pattern with `spawn(signal recv) + wait` in `cmd/discovery.k` and `cmd/mock_server.k`
+  - compatible with current local runtime (`v0.8.5`) and newer (`v0.8.6+`)
 
 ## Next
 

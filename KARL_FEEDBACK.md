@@ -7,8 +7,9 @@
   - Workaround: `map().set("Content-Type", "application/json")`.
 - `_ -> ...` lambda shorthand inside object fields fails parsing in handlers.
   - Workaround: explicit param (`req -> ...`).
-- Top-level blocking `signalWatch(...).recv()` can deadlock in CLI scripts.
-  - Workaround: run signal recv in spawned task and keep main alive.
+- Top-level `signalWatch(...).recv()` deadlocked in older Karl runtime builds.
+  - Fixed upstream in Karl `v0.8.6`.
+  - Vigil entrypoints use `spawn(() -> signalWatch(...).recv())` + `wait` for cross-version compatibility.
 - Recover blocks can reject direct `[]` return in some forms.
   - Workaround: assign fallback first (`let fallback = []; fallback`).
 - `match` guards using `when` are not available in current parser build.

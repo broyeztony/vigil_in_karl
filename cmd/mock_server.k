@@ -5,11 +5,7 @@ let cfg = Config.get()
 let app = MockServer.start(cfg)
 log({ mock_addr: cfg.mock_addr, users: app.state.users.length, })
 
-spawn (() -> {
-    let [sig, done] = signalWatch(["SIGINT", "SIGTERM"]).recv()
-    if !done { log("shutdown", sig) }
-    MockServer.stop(app)
-    exit(0)
-})()
-
-for true { sleep(1000) } then ()
+let sigTask = spawn (() -> signalWatch(["SIGINT", "SIGTERM"]).recv())()
+let [sig, done] = wait sigTask
+if !done { log("shutdown", sig) }
+MockServer.stop(app)

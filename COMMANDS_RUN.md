@@ -5,3 +5,5 @@
 - 2026-03-14: `make test` - executed smoke and churn suites repeatedly during rebuild.
 - 2026-03-14: `make watch-db` - inspected DB row evolution.
 - 2026-03-14: `karl run cmd/mock_server.k` - manual lifecycle/signal checks.
+- 2026-03-14: `make test` - verified entrypoint signal refactor against current Karl runtime.
+- 2026-03-14: `karl run cmd/mock_server.k` + `kill -TERM <pid>` and `karl run cmd/discovery.k` + `kill -TERM <pid>` - verified signal shutdown path with task-wrapped signal recv.

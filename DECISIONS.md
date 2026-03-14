@@ -8,3 +8,6 @@
 - User churn handled by lifecycle reconciliation (start/stop worker by provider snapshot).
 - Docker Postgres remains on host port `55432` to avoid local host DB conflicts.
 - Keep `.k` files under 55 LoC to preserve composability and reviewability.
+- Entrypoints use `spawn(signal recv) + wait` for signal lifecycle handling:
+  - cleaner than spawn + infinite sleep loop
+  - works across current local runtime and newer runtime fixes

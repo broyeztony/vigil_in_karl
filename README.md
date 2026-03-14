@@ -46,6 +46,7 @@ flowchart LR
 - Unknown-user email fetches during churn are tolerated.
 - Process shutdown is signal-driven and cancel-safe.
 - DB writes use idempotent upsert/link semantics.
+- Analysis enqueue occurs only after successful store of a new unique email.
 
 ## Current Commands
 
@@ -67,6 +68,7 @@ Default DB DSN:
 
 - `tests/mock_provider_smoke.k`
 - `tests/discovery_smoke.k`
+- `tests/discovery_analysis_queue_smoke.k`
 - `tests/discovery_user_churn.k`
 - `tests/discovery_provider_users_error_no_remove.k`
 

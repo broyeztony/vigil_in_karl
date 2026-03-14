@@ -28,6 +28,10 @@
   - skip add/remove diff for that cycle
   - added regression test `tests/discovery_provider_users_error_no_remove.k`
 - removed all explicit module export objects from `lib/*.k` (top-level `let` bindings are exported by import semantics)
+- wired analysis queue enqueue point after successful/deduped store in consumers:
+  - `DbEmails.store(...)` now returns `{ isNew, email_id }`
+  - consumers enqueue only `isNew` emails to `state.analysis_queue`
+  - added analysis queue smoke test `tests/discovery_analysis_queue_smoke.k`
 
 ## Next
 

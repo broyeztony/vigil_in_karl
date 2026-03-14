@@ -2,6 +2,7 @@
 set -euo pipefail
 
 docker compose up -d postgres >/dev/null
+bash scripts/wait_db.sh
 karl run cmd/setup.k >/dev/null
 
 PORT=18081 MOCK_INITIAL_USERS=8 karl run cmd/mock_server.k >/tmp/vik_mock.log 2>&1 &

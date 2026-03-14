@@ -10,6 +10,9 @@ First-principles rebuild of Vigil in Karl.
   - `cmd/mock_server.k`
   - `cmd/discovery.k`
 
+Default DB DSN:
+`postgres://vigil:vigil@127.0.0.1:55432/vigil?sslmode=disable`
+
 ## Quickstart
 
 ```bash

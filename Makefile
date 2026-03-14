@@ -10,6 +10,7 @@ clean:
 	docker compose down -v
 
 setup:
+	bash scripts/wait_db.sh
 	karl run cmd/setup.k
 
 mock:

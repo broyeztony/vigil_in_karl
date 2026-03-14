@@ -24,6 +24,10 @@
 - removed signal workaround in entrypoints:
   - replaced spawn+infinite-sleep pattern with `spawn(signal recv) + wait` in `cmd/discovery.k` and `cmd/mock_server.k`
   - compatible with current local runtime (`v0.8.5`) and newer (`v0.8.6+`)
+- fixed reconcile semantics on provider users fetch failure:
+  - do not fallback to `[]`
+  - skip add/remove diff for that cycle
+  - added regression test `tests/discovery_provider_users_error_no_remove.k`
 
 ## Next
 

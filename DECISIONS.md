@@ -11,3 +11,6 @@
 - Entrypoints use `spawn(signal recv) + wait` for signal lifecycle handling:
   - cleaner than spawn + infinite sleep loop
   - works across current local runtime and newer runtime fixes
+- Provider users fetch failure must not be interpreted as empty snapshot.
+  - Reconciler now skips removal/addition diff when provider users request fails.
+  - Matches original Vigil behavior (log and retry on next tick).

@@ -14,3 +14,6 @@
   - Workaround: assign fallback first (`let fallback = []; fallback`).
 - `match` guards using `when` are not available in current parser build.
   - Use nested `if` inside `case` branches.
+- Reconcile logic should distinguish provider failure from authoritative empty result.
+  - Treating fetch error as `[]` can trigger mass user removal.
+  - Correct model: log error and skip reconcile diff for that cycle.

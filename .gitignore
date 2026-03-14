@@ -1,3 +1,5 @@
 test.log
 *.log
 .env
+
+.DS_Store

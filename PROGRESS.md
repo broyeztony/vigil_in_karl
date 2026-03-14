@@ -2,33 +2,28 @@
 
 ## Current Milestone
 
-- M1: runnable first-principles baseline (postgres + mock + discovery)
+- M1: high-efficiency ingestion core (reconciler + worker pool + queue + consumers)
 
 ## Done
 
-- reset legacy codebase
-- created AGENTS.md with strict coding and workflow rules
-- scaffolded rebuild docs, scripts, and Make targets
-- implemented first-principles Karl modules for:
-  - config
-  - db core/schema/users/emails
-  - provider client
-  - mock users/emails/http server
-  - discovery cycle + app orchestration
-- added runnable commands:
-  - `cmd/setup.k`
-  - `cmd/mock_server.k`
-  - `cmd/discovery.k`
-- added smoke tests:
-  - `tests/mock_provider_smoke.k`
-  - `tests/discovery_smoke.k`
-- validated:
+- restarted implementation from scratch after `.k` purge
+- rebuilt compact module graph (all `.k` files <= 55 LoC)
+- implemented efficient runtime topology:
+  - reconciler manages active users/workers
+  - per-user long-lived polling workers
+  - bounded queue (`buffered`) for backpressure
+  - consumer pool for DB persistence
+- rebuilt mock provider with admin controls:
+  - `POST /admin/users/set?num_users=`
+  - `POST /admin/users/add?num_users=`
+- added churn-aware tests:
+  - `tests/discovery_user_churn.k`
+- validated green:
   - `make setup`
-  - `make watch-db`
   - `make test`
 
 ## Next
 
-- split discovery flow into smaller role-specific modules (scheduler, persistence, stats)
-- add regression tests: dedupe + user rekey + user removal
-- add dockerized full-stack mode (mock + discovery in compose)
+- add fraud-analysis pipeline (feature extraction + scoring)
+- add API endpoint for flagged email review
+- add stress benchmark scripts for throughput/spike behavior

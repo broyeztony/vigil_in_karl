@@ -14,3 +14,6 @@
 - Provider users fetch failure must not be interpreted as empty snapshot.
   - Reconciler now skips removal/addition diff when provider users request fails.
   - Matches original Vigil behavior (log and retry on next tick).
+- Removed explicit module export objects (`{ ... }`) from `lib/*.k`.
+  - Karl imports already expose all top-level `let` bindings via module object.
+- Entrypoints now use direct top-level `signalWatch(...).recv()`.

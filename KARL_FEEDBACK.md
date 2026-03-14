@@ -9,7 +9,7 @@
   - Workaround: explicit param (`req -> ...`).
 - Top-level `signalWatch(...).recv()` deadlocked in older Karl runtime builds.
   - Fixed upstream in Karl `v0.8.6`.
-  - Vigil entrypoints use `spawn(() -> signalWatch(...).recv())` + `wait` for cross-version compatibility.
+  - Vigil entrypoints now use direct top-level `signalWatch(...).recv()`.
 - Recover blocks can reject direct `[]` return in some forms.
   - Workaround: assign fallback first (`let fallback = []; fallback`).
 - `match` guards using `when` are not available in current parser build.

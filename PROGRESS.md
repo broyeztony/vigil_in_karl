@@ -22,12 +22,12 @@
   - `make setup`
   - `make test`
 - removed signal workaround in entrypoints:
-  - replaced spawn+infinite-sleep pattern with `spawn(signal recv) + wait` in `cmd/discovery.k` and `cmd/mock_server.k`
-  - compatible with current local runtime (`v0.8.5`) and newer (`v0.8.6+`)
+  - switched entrypoints to direct top-level `signalWatch(...).recv()`
 - fixed reconcile semantics on provider users fetch failure:
   - do not fallback to `[]`
   - skip add/remove diff for that cycle
   - added regression test `tests/discovery_provider_users_error_no_remove.k`
+- removed all explicit module export objects from `lib/*.k` (top-level `let` bindings are exported by import semantics)
 
 ## Next
 

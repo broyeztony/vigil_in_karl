@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: vik-postgres
+    environment:
+      POSTGRES_USER: vigil
+      POSTGRES_PASSWORD: vigil
+      POSTGRES_DB: vigil
+    ports:
+      - "5432:5432"
+    volumes:
+      - vik_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vigil -d vigil"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  vik_pg_data:

@@ -4,9 +4,15 @@ let consumeOne = state -> {
     for true {
         let [msg, done] = state.queue.recv()
         if done { break () }
-        DbEmails.store(state.db, msg.user_id, msg.email) ? {
+        let stored = DbEmails.store(state.db, msg.user_id, msg.email) ? {
             log("consumer store error", { user_id: msg.user_id, message: error.message, })
-            ()
+            null
+        }
+        if stored != null && stored.isNew {
+            state.analysis_queue.send({ user_id: msg.user_id, email_id: stored.email_id, email: msg.email, }) ? {
+                log("analysis enqueue error", { user_id: msg.user_id, message: error.message, })
+                ()
+            }
         }
     } then ()
 }

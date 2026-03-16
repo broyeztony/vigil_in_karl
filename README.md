@@ -54,6 +54,7 @@ flowchart LR
 make up
 make setup
 make mock        # terminal A
+make mock-ramp   # terminal A (starts at 32 users, ramps by +32 up to 5000)
 make discovery   # terminal B
 make watch-db
 make test

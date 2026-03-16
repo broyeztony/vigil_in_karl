@@ -4,16 +4,22 @@ set -euo pipefail
 docker compose up -d postgres >/dev/null
 bash scripts/wait_db.sh
 
-echo "=== vigil_in_karl DB inspector ==="
-echo "target: docker:vik-postgres"
+interval="${WATCH_DB_INTERVAL:-2}"
 
-has_schema="$(docker exec -i vik-postgres psql -U vigil -d vigil -tAc "SELECT to_regclass('public.tenant') IS NOT NULL;" | tr -d '[:space:]')"
-if [[ "${has_schema}" != "t" ]]; then
-  echo "schema not initialized; run: make setup"
-  exit 0
-fi
+render() {
+  if [[ -t 1 ]]; then clear; fi
+  echo "=== vigil_in_karl DB inspector ==="
+  echo "target: docker:vik-postgres"
+  echo "updated: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  echo
 
-docker exec -i vik-postgres psql -U vigil -d vigil <<'SQL'
+  has_schema="$(docker exec -i vik-postgres psql -U vigil -d vigil -tAc "SELECT to_regclass('public.tenant') IS NOT NULL;" | tr -d '[:space:]')"
+  if [[ "${has_schema}" != "t" ]]; then
+    echo "schema not initialized; run: make setup"
+    return
+  fi
+
+  docker exec -i vik-postgres psql -U vigil -d vigil <<'SQL'
 \pset pager off
 \timing off
 
@@ -25,3 +31,9 @@ SELECT 'emails', COUNT(*) FROM emails
 UNION ALL
 SELECT 'user_emails', COUNT(*) FROM user_emails;
 SQL
+}
+
+while true; do
+  render
+  sleep "${interval}"
+done

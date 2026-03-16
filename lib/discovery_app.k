@@ -2,6 +2,7 @@ let DbCore = (import "./db_core.k")()
 let DbSchema = (import "./db_schema.k")()
 let Analysis = (import "./discovery_analysis.k")()
 let Consumers = (import "./discovery_consumers.k")()
+let Metrics = (import "./discovery_metrics.k")()
 let Reconciler = (import "./discovery_reconciler.k")()
 let Workers = (import "./discovery_workers.k")()
 
@@ -20,10 +21,12 @@ let start = cfg -> {
         analysis_tasks: [],
         analysis_enqueued: 0,
         consumer_tasks: [],
+        metrics_task: null,
     }
 
     Analysis.start(state)
     Consumers.start(state)
+    Metrics.start(state)
     state.reconciler = spawn (() -> {
         for state.running.get("on") with _ = 0 {
             log("sync", Reconciler.run(state))
@@ -41,5 +44,6 @@ let stop = state -> {
     Workers.stopAll(state)
     Consumers.stop(state)
     Analysis.stop(state)
+    Metrics.stop(state)
     DbCore.close(state.db)
 }

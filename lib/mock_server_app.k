@@ -28,4 +28,4 @@ let start = cfg -> {
     { server: srv, state: state, }
 }
 
-let stop = app -> httpServerStop(app.server)
+let stop = app -> httpServerStop(app.server) ? {}

@@ -18,7 +18,8 @@ let run = state -> {
             Workers.ensure(state, user.id)
         })
 
-        keys(state.active)
+        DbUsers.all(state.db)
+            .map(u -> u.id)
             .filter(id -> !has(seen, id))
             .forEach(id -> {
                 Workers.stopOne(state, id)
